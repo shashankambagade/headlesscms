@@ -12,10 +12,10 @@ const SinglePost = () => {
     });
   }, [slug]);
 
-  if (!post) return <p>Loading...</p>;
+  if (!post) return  <div className='max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4'><p>Loading...</p></div>;
 
   return (
-    <div className="p-8">
+     <div className='max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4'>
       <h1 className="text-3xl font-bold mb-4">{post.title.rendered}</h1>
       <div
         className="prose"

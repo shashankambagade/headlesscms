@@ -1,29 +1,90 @@
 import React, { useEffect, useState } from 'react';
 import { getPosts } from '../services/api';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    getPosts().then(res => setPosts(res.data));
+    getPosts().then(async (res) => {
+      const postList = res.data;
+
+      // Fetch featured images manually using featured_media ID
+      const postsWithImages = await Promise.all(
+        postList.map(async (post) => {
+          if (post.featured_media) {
+            try {
+              const mediaRes = await axios.get(
+                `https://gomostaging.com/looklet-com/wp-json/wp/v2/media/${post.featured_media}`
+              );
+              return {
+                ...post,
+                thumbnail: mediaRes.data.source_url,
+              };
+            } catch (err) {
+              return { ...post, thumbnail: null };
+            }
+          }
+          return { ...post, thumbnail: null };
+        })
+      );
+
+      setPosts(postsWithImages);
+    });
   }, []);
 
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold mb-6">Blog Posts</h1>
-      <ul className="space-y-4">
-        {posts.map(post => (
-          <li key={post.id}>
-            <Link to={`/post/${post.slug}`} className="text-blue-500 hover:underline">
-              {post.title.rendered}
-            </Link>
-          </li>
-        ))}
-      </ul>
-      {/* <h2 className="text-3xl font-bold mb-6">Page list</h2> */}
-
-    </div>
+    <div className='max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4'>
+         <div className="py-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {posts.map((post) => (
+                <div
+                  key={post.id}
+                  className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"
+                >
+                  <Link to={`/post/${post.slug}`}>
+                    <img
+                      className="rounded-t-lg w-full h-48 object-cover"
+                      src={post.thumbnail || '/placeholder.jpg'}
+                      alt={post.title.rendered}
+                    />
+                  </Link>
+                  <div className="p-5">
+                    <Link to={`/post/${post.slug}`}>
+                      <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                        {post.title.rendered}
+                      </h5>
+                    </Link>
+                    <div
+                      className="mb-3 font-normal text-gray-700 dark:text-gray-400"
+                      dangerouslySetInnerHTML={{ __html: post.excerpt?.rendered }}
+                    />
+                    <Link
+                      to={`/post/${post.slug}`}
+                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    >
+                      Read more
+                      <svg
+                        className="rtl:rotate-180 w-3.5 h-3.5 ms-2"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 14 10"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M1 5h12m0 0L9 1m4 4L9 9"
+                        />
+                      </svg>
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+            </div>
   );
 };
 

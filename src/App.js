@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import SinglePost from './pages/SinglePost';
 import Pages from './pages/Page';
 import Navbar from './components/navbar/Navbar';
+import Footer from './components/footer/Footer';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
               <Route path="/:slug" element={<Pages />}/>
             </Routes>
         </Router>
+        <Footer/>
      </>
   );
 }

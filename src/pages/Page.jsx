@@ -23,10 +23,10 @@ const Page = () => {
   }, [slug]);
 
   if (notFound) return <div className="p-8 text-red-500">Page Not Found</div>;
-  if (!page) return <div className="p-8">Loading...</div>;
+  if (!page) return  <div className='max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4'>Loading...</div>;
 
   return (
-    <div className="p-8">
+    <div className='max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4'>
       <h1 className="text-3xl font-bold mb-4">{page.title.rendered}</h1>
       <div dangerouslySetInnerHTML={{ __html: page.content.rendered }} className="prose" />
     </div>
